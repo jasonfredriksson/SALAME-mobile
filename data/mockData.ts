@@ -1,3 +1,29 @@
+// Define the product type to include all properties
+export interface Product {
+  id: string;
+  title: string;
+  price: number;
+  description: string;
+  images: string[];
+  category: string;
+  location: string;
+  postedTime: string;
+  fastShipping: boolean;
+  securePayment: boolean;
+  sellerId: string;
+  seller: {
+    id: string;
+    name: string;
+    avatar: string;
+    rating: number;
+    totalSales: number;
+    reputationBadge?: string;
+  };
+  isNew: boolean;
+  minOfferPrice?: number;
+  condition?: string;
+}
+
 export const mockUser = {
   id: 'user-1',
   name: 'Lucía Fernández',
@@ -132,7 +158,9 @@ export const mockProducts = [
       avatar: 'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg?auto=compress&cs=tinysrgb&w=600',
       rating: 5.0,
       totalSales: 21
-    }
+    },
+    minOfferPrice: 200000,
+    condition: 'Excelente'
   },
   {
     id: 'product-6',
@@ -154,7 +182,9 @@ export const mockProducts = [
       avatar: 'https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=600',
       rating: 4.8,
       totalSales: 24
-    }
+    },
+    minOfferPrice: 65000,
+    condition: 'Usado'
   },
   // Productos adicionales por categoría - Electrónica
   {
@@ -264,6 +294,155 @@ export const mockProducts = [
       reputationBadge: 'Gran Salame'
     }
   }
+];
+
+// Mock notifications for the user
+export const mockNotifications = [
+  {
+    id: 'notif-1',
+    type: 'offer',
+    title: 'Nueva oferta recibida',
+    message: 'Has recibido una oferta de $40000 por tu Campera de Cuero Vintage',
+    timestamp: new Date(Date.now() - 35 * 60000).toISOString(),
+    read: false,
+    relatedId: 'product-1',
+    relatedImage: 'https://images.pexels.com/photos/2887766/pexels-photo-2887766.jpeg?auto=compress&cs=tinysrgb&w=600',
+    fromUser: {
+      id: 'user-5',
+      name: 'Carolina Vázquez',
+      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600'
+    }
+  },
+  {
+    id: 'notif-2',
+    type: 'message',
+    title: 'Nuevo mensaje',
+    message: 'Ana Gómez: ¡Perfecto! Nos vemos mañana a las 3pm.',
+    timestamp: new Date(Date.now() - 180 * 60000).toISOString(),
+    read: true,
+    relatedId: 'conv-2',
+    relatedImage: 'https://images.pexels.com/photos/6770027/pexels-photo-6770027.jpeg?auto=compress&cs=tinysrgb&w=600',
+    fromUser: {
+      id: 'user-3',
+      name: 'Ana Gómez',
+      avatar: 'https://images.pexels.com/photos/1520760/pexels-photo-1520760.jpeg?auto=compress&cs=tinysrgb&w=600'
+    }
+  },
+  {
+    id: 'notif-3',
+    type: 'sale',
+    title: '¡Venta completada!',
+    message: 'Tu producto "iPhone 13 Pro" ha sido marcado como vendido',
+    timestamp: new Date(Date.now() - 5400 * 60000).toISOString(),
+    read: true,
+    relatedId: 'product-2',
+    relatedImage: 'https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&w=600',
+  },
+  {
+    id: 'notif-4',
+    type: 'system',
+    title: 'Promoción especial',
+    message: 'Publica 3 productos esta semana y obtén un 50% de descuento en destacados',
+    timestamp: new Date(Date.now() - 8640 * 60000).toISOString(),
+    read: false,
+    relatedId: null,
+    relatedImage: 'https://images.pexels.com/photos/6770027/pexels-photo-6770027.jpeg?auto=compress&cs=tinysrgb&w=600',
+  },
+  {
+    id: 'notif-5',
+    type: 'offer_accepted',
+    title: 'Oferta aceptada',
+    message: 'Martín Rodríguez ha aceptado tu oferta por la Bicicleta Montaña',
+    timestamp: new Date(Date.now() - 720 * 60000).toISOString(),
+    read: false,
+    relatedId: 'product-4',
+    relatedImage: 'https://images.pexels.com/photos/2158963/pexels-photo-2158963.jpeg?auto=compress&cs=tinysrgb&w=600',
+    fromUser: {
+      id: 'user-2',
+      name: 'Martín Rodríguez',
+      avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=600'
+    }
+  },
+];
+
+// Mock user offers (both sent and received)
+export const mockOffers = [
+  {
+    id: 'offer-1',
+    type: 'sent',
+    product: {
+      id: 'product-4',
+      title: 'Bicicleta Montaña - Venzo',
+      price: 190000,
+      image: 'https://images.pexels.com/photos/2158963/pexels-photo-2158963.jpeg?auto=compress&cs=tinysrgb&w=600'
+    },
+    seller: {
+      id: 'user-5',
+      name: 'Carolina Vázquez',
+      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600'
+    },
+    offerPrice: 170000,
+    offerDate: new Date(Date.now() - 2880 * 60000).toISOString(),
+    status: 'accepted',
+    message: 'Me interesa la bicicleta pero necesito que me la guardes hasta el fin de semana.'
+  },
+  {
+    id: 'offer-2',
+    type: 'received',
+    product: {
+      id: 'product-1',
+      title: 'Campera de Cuero Vintage',
+      price: 45000,
+      image: 'https://images.pexels.com/photos/2887766/pexels-photo-2887766.jpeg?auto=compress&cs=tinysrgb&w=600'
+    },
+    buyer: {
+      id: 'user-3',
+      name: 'Ana Gómez',
+      avatar: 'https://images.pexels.com/photos/1520760/pexels-photo-1520760.jpeg?auto=compress&cs=tinysrgb&w=600'
+    },
+    offerPrice: 40000,
+    offerDate: new Date(Date.now() - 35 * 60000).toISOString(),
+    status: 'pending',
+    message: 'Hola! Te ofrezco $40000 si me la guardas hasta el viernes.'
+  },
+  {
+    id: 'offer-3',
+    type: 'sent',
+    product: {
+      id: 'product-10',
+      title: 'Raqueta de Tenis Wilson',
+      price: 65000,
+      image: 'https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg?auto=compress&cs=tinysrgb&w=600'
+    },
+    seller: {
+      id: 'user-6',
+      name: 'Alejandro Martínez',
+      avatar: 'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg?auto=compress&cs=tinysrgb&w=600'
+    },
+    offerPrice: 55000,
+    offerDate: new Date(Date.now() - 1440 * 60000).toISOString(),
+    status: 'rejected',
+    message: 'Te ofrezco $55000 en efectivo, la puedo ir a buscar hoy mismo.'
+  },
+  {
+    id: 'offer-4',
+    type: 'received',
+    product: {
+      id: 'product-6',
+      title: 'Colección de Discos de Vinilo Clásicos',
+      price: 75000,
+      image: 'https://images.pexels.com/photos/4644812/pexels-photo-4644812.jpeg?auto=compress&cs=tinysrgb&w=600'
+    },
+    buyer: {
+      id: 'user-4',
+      name: 'Gabriel López',
+      avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600'
+    },
+    offerPrice: 65000,
+    offerDate: new Date(Date.now() - 500 * 60000).toISOString(),
+    status: 'pending',
+    message: 'Hola! Me interesa tu colección de vinilos. Te ofrezco $65000 si me los puedes enviar.'
+  },
 ];
 
 export const mockConversations = [

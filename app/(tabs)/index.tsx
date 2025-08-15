@@ -99,12 +99,12 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={[styles.safeArea, isLargeScreen && styles.webSafeArea]}>
-      {isLargeScreen && <WebHeader />}
+      <WebHeader />
       <View style={[styles.container, isLargeScreen && styles.webContainer]}>
         <StatusBar style="auto" />
         <ResponsiveContainer webCentered mobileFullWidth={false}>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Mercado</Text>
+          {/* Mobile action buttons without duplicate title */}
+          <View style={styles.headerActionsContainer}>
             <View style={styles.headerActions}>
               <TouchableOpacity style={styles.locationButton} onPress={() => setLocationModalVisible(true)}>
                 <MapPin size={18} color="#6B46C1" />
@@ -312,6 +312,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FA',
     paddingTop: 30,
   },
+  headerActionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E6F0FA',
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -321,11 +331,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E6F0FA',
+    display: 'none', // Hide this since we're using WebHeader now
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: '700',
     color: '#1A1A1A',
+    marginLeft: -8, // Negative margin to pull it slightly left
   },
   headerActions: {
     flexDirection: 'row',

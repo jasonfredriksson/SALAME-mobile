@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { ResponsiveContainer } from '@/components/ResponsiveContainer';
+import { WebHeader } from '@/components/WebHeader';
+import { UserQualifications } from '@/components/UserQualifications';
 import { useDimensions } from '@/utils/responsive';
 import {
   ChevronLeft,
@@ -21,6 +23,9 @@ import {
   Clock,
   Star,
   Tag,
+  MessageCircle,
+  CheckCircle,
+  Plus,
 } from 'lucide-react-native';
 import { mockProducts } from '@/data/mockData';
 
@@ -31,6 +36,10 @@ export default function ProductDetailScreen() {
   const { isDesktop, isTablet } = useDimensions();
   const isLargeScreen = isDesktop || isTablet;
   const router = useRouter();
+
+  const goToPublish = () => {
+    router.push('/publish');
+  };
   const productId = typeof id === 'string' ? id : id?.[0] || '';
   
   // Find the product from our mock data
@@ -76,13 +85,19 @@ export default function ProductDetailScreen() {
   };
 
   const handleBuy = () => {
-    // In a real app, this would navigate to the purchase flow
-    alert('Flujo de compra: Esta funcionalidad estaría completa para el lanzamiento');
+    // Navigate to the checkout flow
+    router.push(`/checkout/${product.id}`);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
+      <WebHeader />
+      
+      {/* Floating action button for publishing */}
+      <TouchableOpacity style={styles.publishFAB} onPress={goToPublish}>
+        <Plus size={24} color="#FFFFFF" />
+      </TouchableOpacity>
       <ResponsiveContainer webCentered>
         <View style={styles.header}>
           <TouchableOpacity
@@ -112,14 +127,15 @@ export default function ProductDetailScreen() {
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.imageContainer}>
+          <View style={[styles.imageContainer, isLargeScreen && styles.imageContainerDesktop]}>
             <ScrollView
               horizontal
               pagingEnabled
               showsHorizontalScrollIndicator={false}
               onMomentumScrollEnd={(event: {nativeEvent: {contentOffset: {x: number}}}) => {
+                const containerWidth = isLargeScreen ? Math.min(width * 0.8, 600) : width;
                 const newIndex = Math.round(
-                  event.nativeEvent.contentOffset.x / width
+                  event.nativeEvent.contentOffset.x / containerWidth
                 );
                 setCurrentImageIndex(newIndex);
               }}
@@ -128,8 +144,11 @@ export default function ProductDetailScreen() {
                 <Image
                   key={index}
                   source={{ uri: image }}
-                  style={styles.productImage}
-                  resizeMode="cover"
+                  style={[
+                    styles.productImage, 
+                    isLargeScreen && { width: Math.min(width * 0.8, 600), height: 500 }
+                  ]}
+                  resizeMode="contain"
                 />
               ))}
             </ScrollView>
@@ -174,12 +193,21 @@ export default function ProductDetailScreen() {
               />
               <View style={styles.sellerInfo}>
                 <Text style={styles.sellerName}>{product.seller.name}</Text>
-                <View style={styles.ratingContainer}>
-                  <Star size={14} color="#F59E0B" fill="#F59E0B" />
-                  <Text style={styles.ratingText}>
-                    {product.seller.rating.toFixed(1)} · {product.seller.totalSales} ventas
-                  </Text>
-                </View>
+                <Text style={styles.sellerLocation}>Madrid, España</Text>
+                
+                {/* Seller qualifications */}
+                <UserQualifications 
+                  verifiedSeller={true}
+                  rating={4.8}
+                  totalSales={42}
+                  isSalamePay={true}
+                />
+              </View>
+              <View style={styles.ratingContainer}>
+                <Star size={14} color="#F59E0B" fill="#F59E0B" />
+                <Text style={styles.ratingText}>
+                  {product.seller.rating.toFixed(1)} · {product.seller.totalSales} ventas
+                </Text>
               </View>
             </View>
 
@@ -202,7 +230,7 @@ export default function ProductDetailScreen() {
                 style={styles.contactButton}
                 onPress={handleContact}
               >
-                <MessageSquare size={16} color="#FFFFFF" />
+                <MessageCircle size={16} color="#FFFFFF" />
                 <Text style={styles.buttonText}>Contactar</Text>
               </TouchableOpacity>
               
@@ -214,11 +242,11 @@ export default function ProductDetailScreen() {
                 <Text style={styles.buttonText}>Hacer oferta</Text>
               </TouchableOpacity>
               
-              <TouchableOpacity
+              <TouchableOpacity 
                 style={styles.buyButton}
-                onPress={handleBuy}
+                onPress={() => router.push(`/checkout/${product.id}`)}
               >
-                <Text style={styles.buttonText}>Comprar</Text>
+                <Text style={styles.buyButtonText}>Comprar</Text>
               </TouchableOpacity>
             </View>
           </ResponsiveContainer>
@@ -228,6 +256,23 @@ export default function ProductDetailScreen() {
 }
 
 const styles = StyleSheet.create({
+  publishFAB: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#6B46C1',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    zIndex: 100,
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
@@ -282,11 +327,24 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     position: 'relative',
-    height: width * 0.8, // Maintain aspect ratio
+    height: width * 0.8, // Maintain aspect ratio for mobile
+    maxHeight: 500, // Cap maximum height
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imageContainerDesktop: {
+    height: 500, // Fixed height for desktop
+    alignSelf: 'center',
+    width: '100%',
+    maxWidth: 600, // Cap maximum width on desktop
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   productImage: {
     width,
     height: width * 0.8,
+    resizeMode: 'contain',
+    alignSelf: 'center',
   },
   pagination: {
     position: 'absolute',

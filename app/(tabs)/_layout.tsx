@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
-import { StyleSheet } from 'react-native';
-import { Chrome as Home, Search, CirclePlus as PlusCircle, MessageSquare, User } from 'lucide-react-native';
+import { StyleSheet, View, Text } from 'react-native';
+import { Chrome as Home, Search, CirclePlus as PlusCircle, MessageSquare, User, BellDot, Tag } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -11,7 +11,7 @@ export default function TabLayout() {
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabBarLabel,
         headerShown: false,
-        tabBarShowLabel: true, // Siempre mostrar etiquetas
+        tabBarShowLabel: false, // Hide default labels to avoid duplication
         tabBarItemStyle: styles.tabBarItem,
       }}
     >
@@ -19,35 +19,84 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Inicio',
-          tabBarIcon: ({ color, size }: { color: string; size: number }) => <Home size={size} color={color} />,
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
+            <View style={styles.tabIconContainer}>
+              <Home size={size} color={color} />
+              <Text style={[styles.tabBarLabel, { color }]}>Inicio</Text>
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
           title: 'Explorar',
-          tabBarIcon: ({ color, size }: { color: string; size: number }) => <Search size={size} color={color} />,
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
+            <View style={styles.tabIconContainer}>
+              <Search size={size} color={color} />
+              <Text style={[styles.tabBarLabel, { color }]}>Explorar</Text>
+            </View>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: 'Notificaciones',
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
+            <View style={styles.tabIconContainer}>
+              <BellDot size={size} color={color} />
+              <Text style={[styles.tabBarLabel, { color }]}>Notificaciones</Text>
+            </View>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="offers"
+        options={{
+          title: 'Ofertas',
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
+            <View style={styles.tabIconContainer}>
+              <Tag size={size} color={color} />
+              <Text style={[styles.tabBarLabel, { color }]}>Ofertas</Text>
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
         name="sell"
         options={{
           title: 'Vender',
-          tabBarIcon: ({ color, size }: { color: string; size: number }) => <PlusCircle size={size} color={color} />,
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
+            <View style={styles.tabIconContainer}>
+              <PlusCircle size={size} color={color} />
+              <Text style={[styles.tabBarLabel, { color }]}>Vender</Text>
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
         name="messages"
         options={{
           title: 'Mensajes',
-          tabBarIcon: ({ color, size }: { color: string; size: number }) => <MessageSquare size={size} color={color} />,
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
+            <View style={styles.tabIconContainer}>
+              <MessageSquare size={size} color={color} />
+              <Text style={[styles.tabBarLabel, { color }]}>Mensajes</Text>
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Perfil',
-          tabBarIcon: ({ color, size }: { color: string; size: number }) => <User size={size} color={color} />,
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
+            <View style={styles.tabIconContainer}>
+              <User size={size} color={color} />
+              <Text style={[styles.tabBarLabel, { color }]}>Perfil</Text>
+            </View>
+          ),
         }}
       />
     </Tabs>
@@ -63,15 +112,22 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -1 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    height: 65, // Barra más alta
+    height: 70, // Taller bar to accommodate custom icons with text
   },
   tabBarLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    marginBottom: 6,
+    fontSize: 9, // Even smaller text for better fit
+    fontWeight: '600',
+    marginTop: 4, // Space between icon and text
+    lineHeight: 12,
   },
   tabBarItem: {
-    paddingVertical: 8, // Espaciado vertical adicional
-    height: 60, // Altura del item para acomodar el icono y el texto
+    height: 70,
+    paddingVertical: 8,
+  },
+  tabIconContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 4,
   },
 });

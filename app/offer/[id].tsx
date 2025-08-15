@@ -13,8 +13,10 @@ import {
   Alert,
 } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
-import { ChevronLeft, Send, Tag, Percent } from 'lucide-react-native';
+import { ChevronLeft, Send, Tag, Percent, CheckCircle, X } from 'lucide-react-native';
 import { mockProducts } from '@/data/mockData';
+import { WebHeader } from '@/components/WebHeader';
+import { UserQualifications } from '@/components/UserQualifications';
 
 export default function OfferScreen() {
   const { id } = useLocalSearchParams();
@@ -26,6 +28,8 @@ export default function OfferScreen() {
   
   const [offerAmount, setOfferAmount] = useState(product ? (product.price * 0.9).toFixed(2) : '0');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showAutomaticProcessing, setShowAutomaticProcessing] = useState(false);
+  const [showRejected, setShowRejected] = useState(false);
   
   if (!product) {
     return (
@@ -50,14 +54,40 @@ export default function OfferScreen() {
   const isValidOffer = parseFloat(offerAmount) > 0 && parseFloat(offerAmount) < product.price;
   
   const handleSubmitOffer = () => {
-    // In a real app, this would send the offer to the backend
-    setShowSuccess(true);
-    
-    // Automatically return to product page after 3 seconds
-    setTimeout(() => {
-      router.back();
-    }, 3000);
+    if (product.minOfferPrice) {
+      setShowAutomaticProcessing(true);
+      setTimeout(() => {
+        setShowAutomaticProcessing(false);
+        if (parseFloat(offerAmount) >= product.minOfferPrice!) {
+          setShowSuccess(true);
+          setTimeout(() => {
+            router.push(`/checkout/${product.id}`);
+          }, 3000);
+        } else {
+          setShowRejected(true);
+          setTimeout(() => {
+            router.back();
+          }, 3000);
+        }
+      }, 1500);
+    } else {
+      setShowSuccess(true);
+      // Automatically return to product page after 3 seconds
+      setTimeout(() => {
+        router.back();
+      }, 3000);
+    }
   };
+  
+  // Calculate the recommended price if minOfferPrice exists
+  const getRecommendedPrice = () => {
+    if (product?.minOfferPrice) {
+      return product.minOfferPrice;
+    }
+    return null;
+  };
+  
+  const recommendedPrice = getRecommendedPrice();
   
   return (
     <SafeAreaView style={styles.container}>
@@ -81,7 +111,38 @@ export default function OfferScreen() {
           <View style={{ width: 40 }} /> {/* Spacer for alignment */}
         </View>
         
-        {showSuccess ? (
+        {showAutomaticProcessing ? (
+          <View style={styles.processingContainer}>
+            <View style={styles.processingIcon}>
+              <Percent size={50} color="#6B46C1" />
+            </View>
+            <Text style={styles.processingTitle}>Procesando oferta...</Text>
+            <Text style={styles.processingText}>
+              El sistema está verificando si tu oferta cumple con los criterios automáticos
+              establecidos por el vendedor.
+            </Text>
+          </View>
+        ) : showRejected ? (
+          <View style={styles.rejectedContainer}>
+            <View style={styles.rejectedIcon}>
+              <X size={50} color="#EF4444" />
+            </View>
+            <Text style={styles.rejectedTitle}>Oferta rechazada</Text>
+            <Text style={styles.rejectedText}>
+              Tu oferta de ${offerAmount} ha sido rechazada automáticamente porque
+              es menor que el precio mínimo aceptado por el vendedor (${product.minOfferPrice}).
+            </Text>
+            <TouchableOpacity
+              style={styles.tryAgainButton}
+              onPress={() => setShowRejected(false)}
+            >
+              <Text style={styles.tryAgainText}>Intentar de nuevo</Text>
+            </TouchableOpacity>
+            <Text style={styles.redirectingText}>
+              Volviendo a la página del producto...
+            </Text>
+          </View>
+        ) : showSuccess ? (
           <View style={styles.successContainer}>
             <View style={styles.successIcon}>
               <Send size={50} color="#6B46C1" />
@@ -106,8 +167,21 @@ export default function OfferScreen() {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
-            {/* Product summary */}
-            <View style={styles.productSummary}>
+            {/* Auto-offer info box */}
+          {product?.minOfferPrice && (
+            <View style={styles.autoOfferContainer}>
+              <View style={styles.autoOfferHeader}>
+                <CheckCircle size={18} color="#10B981" />
+                <Text style={styles.autoOfferTitle}>Oferta automática habilitada</Text>
+              </View>
+              <Text style={styles.autoOfferDescription}>
+                Este producto tiene habilitada la aceptación automática de ofertas. Si ofreces un precio igual o mayor a <Text style={styles.highlightText}>${product.minOfferPrice}</Text> tu oferta será aceptada inmediatamente.
+              </Text>
+            </View>
+          )}
+          
+          {/* Product summary */}
+          <View style={styles.productSummary}>
               <Image source={{ uri: product.images[0] }} style={styles.productImage} />
               <View style={styles.productInfo}>
                 <Text style={styles.productTitle} numberOfLines={2}>
@@ -127,7 +201,14 @@ export default function OfferScreen() {
               <Text style={styles.sectionTitle}>¿Cuánto deseas ofrecer?</Text>
               
               <View style={styles.inputContainer}>
-                <Text style={styles.currencySymbol}>$</Text>
+                <Text style={styles.label}>Tu oferta</Text>
+                
+                {/* Recommended price */}
+              {recommendedPrice && (
+                <Text style={styles.recommendedPrice}>
+                  Oferta mínima recomendada: ${recommendedPrice}
+                </Text>
+              )}
                 <TextInput
                   style={styles.offerInput}
                   value={offerAmount}
@@ -171,11 +252,11 @@ export default function OfferScreen() {
               {/* Submit button */}
               <TouchableOpacity
                 style={[
-                  styles.submitButton,
-                  !isValidOffer && styles.submitButtonDisabled
+                  styles.offerButton,
+                  !isValidOffer && styles.disabledButton
                 ]}
-                onPress={handleSubmitOffer}
                 disabled={!isValidOffer}
+                onPress={handleSubmitOffer}
               >
                 <Tag size={20} color="#FFFFFF" />
                 <Text style={styles.submitButtonText}>Enviar oferta</Text>
@@ -189,6 +270,105 @@ export default function OfferScreen() {
 }
 
 const styles = StyleSheet.create({
+  processingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  processingIcon: {
+    backgroundColor: '#EDE9FE',
+    borderRadius: 50,
+    width: 100,
+    height: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  processingTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#4C1D95',
+    marginBottom: 16,
+  },
+  processingText: {
+    fontSize: 16,
+    color: '#4B5563',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  rejectedContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  rejectedIcon: {
+    backgroundColor: '#FEE2E2',
+    borderRadius: 50,
+    width: 100,
+    height: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  rejectedTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#B91C1C',
+    marginBottom: 16,
+  },
+  rejectedText: {
+    fontSize: 16,
+    color: '#4B5563',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  tryAgainButton: {
+    backgroundColor: '#EF4444',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  tryAgainText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  autoOfferContainer: {
+    backgroundColor: '#ECFDF5',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#D1FAE5',
+  },
+  autoOfferHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  autoOfferTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#065F46',
+    marginLeft: 8,
+  },
+  autoOfferDescription: {
+    fontSize: 14,
+    color: '#065F46',
+    lineHeight: 20,
+  },
+  highlightText: {
+    fontWeight: '700',
+  },
+  recommendedPrice: {
+    fontSize: 14,
+    color: '#6B46C1',
+    fontWeight: '500',
+    marginBottom: 8,
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',

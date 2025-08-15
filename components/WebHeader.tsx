@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ShoppingBag, User, Heart, BellDot } from 'lucide-react-native';
+import { ShoppingBag, User, Heart, BellDot, Tag } from 'lucide-react-native';
 
 interface WebHeaderProps {
   showLogo?: boolean;
@@ -13,21 +13,17 @@ export function WebHeader({ showLogo = true }: WebHeaderProps) {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        {showLogo && (
-          <TouchableOpacity 
-            style={styles.logoContainer} 
-            onPress={() => router.push('/')}
-          >
-            <ShoppingBag size={24} color="#6B46C1" />
-            <Text style={styles.logoText}>SALAME</Text>
-          </TouchableOpacity>
-        )}
-        
-        <View style={styles.center}>
-          <Text style={styles.slogan}>Marketplace de segunda mano para Argentina</Text>
-        </View>
-        
-        <View style={styles.actions}>
+        <View style={styles.leftSection}>
+          {showLogo && (
+            <TouchableOpacity 
+              style={styles.logoContainer} 
+              onPress={() => router.push('/')}
+            >
+              <ShoppingBag size={24} color="#6B46C1" />
+              <Text style={styles.logoText}>SALAME</Text>
+            </TouchableOpacity>
+          )}
+          
           <TouchableOpacity 
             style={styles.actionButton}
             onPress={() => router.push('/favorites')}
@@ -37,12 +33,20 @@ export function WebHeader({ showLogo = true }: WebHeaderProps) {
           
           <TouchableOpacity 
             style={styles.actionButton}
-            onPress={() => router.push('/notifications')}
+            onPress={() => router.push('/(tabs)/notifications')}
           >
             <BellDot size={20} color="#6B46C1" />
             <View style={styles.notificationBadge}>
               <Text style={styles.notificationText}>3</Text>
             </View>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.actionButton, styles.offersButton]}
+            onPress={() => router.push('/(tabs)/offers')}
+          >
+            <Tag size={20} color="#6B46C1" />
+            <Text style={styles.offersButtonText}>Mis Ofertas</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -77,6 +81,7 @@ const styles = StyleSheet.create({
     height: '100%',
     maxWidth: 1200,
     marginHorizontal: 'auto',
+    overflow: 'hidden', // Prevent content from overflowing
   },
   logoContainer: {
     flexDirection: 'row',
@@ -87,6 +92,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#6B46C1',
     marginLeft: 8,
+  },
+  leftSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'flex-start',
   },
   center: {
     flex: 1,
@@ -110,6 +121,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 12,
     position: 'relative',
+  },
+  offersButton: {
+    width: 'auto',
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+  },
+  offersButtonText: {
+    marginLeft: 6,
+    color: '#6B46C1',
+    fontWeight: '500',
+    fontSize: 14,
   },
   notificationBadge: {
     position: 'absolute',

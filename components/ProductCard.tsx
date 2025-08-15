@@ -106,47 +106,49 @@ export function ProductCard({ product, onPress, style }: ProductCardProps) {
         </TouchableOpacity>
       </View>
       <View style={styles.infoContainer}>
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>${product.price.toFixed(2)}</Text>
-          {product.securePayment && (
-            <View style={styles.securePayment}>
-              <Shield size={10} color="#6B46C1" />
-              <Text style={styles.securePaymentText}>Pago Seguro</Text>
-            </View>
-          )}
-        </View>
-        <Text style={styles.title} numberOfLines={1}>
-          {product.title}
-        </Text>
-        <View style={styles.locationContainer}>
-          <Text style={styles.location} numberOfLines={1}>
-            {product.location}
+        <View style={styles.infoTopSection}>
+          <Text style={styles.title} numberOfLines={2}>
+            {product.title}
           </Text>
-        </View>
-      </View>
-      <View style={styles.footer}>
-        <View style={styles.sellerContainer}>
-          <View style={styles.sellerAvatarContainer}>
-            <Image source={{ uri: product.seller.avatar }} style={styles.sellerAvatar} />
-            {/* Badge de reputación según ventas */}
-            {product.seller.totalSales && product.seller.totalSales >= 25 && product.seller.rating >= 4.8 && (
-              <View style={styles.reputationBadge}>
-                <Award size={8} color="#FFFFFF" />
+          <View style={styles.priceContainer}>
+            <Text style={styles.price}>${product.price.toFixed(2)}</Text>
+            {product.securePayment && (
+              <View style={styles.securePayment}>
+                <Shield size={10} color="#6B46C1" />
+                <Text style={styles.securePaymentText}>Pago Seguro</Text>
               </View>
             )}
           </View>
-          <View style={styles.sellerInfo}>
-            <Text style={styles.sellerName} numberOfLines={1}>
-              {product.seller.name}
+          <View style={styles.locationContainer}>
+            <Text style={styles.location} numberOfLines={1}>
+              {product.location}
             </Text>
-            {product.seller.reputationBadge && (
-              <Text style={styles.reputationText}>{product.seller.reputationBadge}</Text>
-            )}
           </View>
         </View>
-        <TouchableOpacity style={styles.messageButton}>
-          <MessageSquare size={16} color="#6B46C1" />
-        </TouchableOpacity>
+        <View style={styles.footer}>
+          <View style={styles.sellerContainer}>
+            <View style={styles.sellerAvatarContainer}>
+              <Image source={{ uri: product.seller.avatar }} style={styles.sellerAvatar} />
+              {/* Badge de reputación según ventas */}
+              {product.seller.totalSales && product.seller.totalSales >= 25 && product.seller.rating >= 4.8 && (
+                <View style={styles.reputationBadge}>
+                  <Award size={8} color="#FFFFFF" />
+                </View>
+              )}
+            </View>
+            <View style={styles.sellerInfo}>
+              <Text style={styles.sellerName} numberOfLines={1}>
+                {product.seller.name}
+              </Text>
+              {product.seller.reputationBadge && (
+                <Text style={styles.reputationText}>{product.seller.reputationBadge}</Text>
+              )}
+            </View>
+          </View>
+          <TouchableOpacity style={styles.messageButton}>
+            <MessageSquare size={16} color="#6B46C1" />
+          </TouchableOpacity>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -155,21 +157,22 @@ export function ProductCard({ product, onPress, style }: ProductCardProps) {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: 260,
     backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    overflow: 'hidden',
+    borderRadius: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 4,
+    elevation: 3,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    minHeight: 160,
   },
   imageContainer: {
-    width: '100%',
-    height: 140,
+    height: 160,
+    width: 160,
     position: 'relative',
-    overflow: 'hidden',
+    backgroundColor: '#F0F0F0',
   },
   image: {
     width: '100%',
@@ -268,8 +271,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   infoContainer: {
-    padding: 8,
-    height: 76, // Altura fija reducida para la sección de información
+    padding: 12,
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  infoTopSection: {
+    flex: 1,
   },
   priceContainer: {
     flexDirection: 'row',
@@ -297,11 +304,10 @@ const styles = StyleSheet.create({
     marginLeft: 2,
   },
   title: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: 15,
+    fontWeight: '600',
     color: '#1A1A1A',
-    marginBottom: 6,
-    height: 18, // Altura fija para asegurar consistencia
+    marginBottom: 8,
   },
   locationContainer: {
     flexDirection: 'row',
@@ -317,11 +323,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    borderTopWidth: 1,
-    borderTopColor: '#6B46C1',
-    height: 42, // Altura fija para el footer
+    paddingRight: 8,
+    paddingTop: 8,
+    height: 42, 
   },
   sellerContainer: {
     flexDirection: 'row',

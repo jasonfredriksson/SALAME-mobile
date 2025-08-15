@@ -58,16 +58,15 @@ export default function SearchScreen() {
       {filteredProducts.length > 0 ? (
         <FlatList<Product>
           data={filteredProducts}
-          numColumns={2}
           renderItem={({ item }: { item: Product }) => (
             <ProductCard
               product={item}
               onPress={() => router.push(`/product/${item.id}`)}
+              style={styles.fullWidthCard}
             />
           )}
           keyExtractor={(item: Product) => item.id}
           contentContainerStyle={styles.productList}
-          columnWrapperStyle={styles.productRow}
           showsVerticalScrollIndicator={false}
         />
       ) : (
@@ -135,9 +134,9 @@ const styles = StyleSheet.create({
   productList: {
     padding: 10,
   },
-  productRow: {
-    justifyContent: 'space-between',
-    marginHorizontal: 2,
+  fullWidthCard: {
+    width: '100%',
+    marginBottom: 12,
   },
   emptyContainer: {
     flex: 1,
